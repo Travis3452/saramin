@@ -1,11 +1,8 @@
-package com.example.saramin.auth;
-
-import org.springframework.context.annotation.Configuration;
+package com.example.saramin.util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-@Configuration
 public class Base64Encoder {
 
     public static String encode(String password) {
