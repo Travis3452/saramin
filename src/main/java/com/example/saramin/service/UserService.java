@@ -14,7 +14,7 @@ import com.example.saramin.repository.LoginHistoryRepository;
 import com.example.saramin.repository.RefreshTokenRepository;
 import com.example.saramin.repository.UserRepository;
 import com.example.saramin.util.Base64Encoder;
-import com.example.saramin.util.EmailValidator;
+import com.example.saramin.util.RegisterValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +39,12 @@ public class UserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     public void register(RegisterForm registerForm) throws CustomExceptions.InvalidRegisterCredentialsException {
-        if (!EmailValidator.isValidEmail(registerForm.getEmail())) {
+        if(!RegisterValidator.isAnyFieldNull(registerForm)) {
+            throw new CustomExceptions.InvalidRegisterCredentialsException("입력하지 않은 값이 존재합니다.");
+        } else if (!RegisterValidator.isValidEmail(registerForm.getEmail())) {
             throw new CustomExceptions.InvalidRegisterCredentialsException("유효하지 않은 이메일 형식입니다.");
+        } else if (!RegisterValidator.isValidPhoneNumber(registerForm.getPhoneNumber())) {
+            throw new CustomExceptions.InvalidRegisterCredentialsException("유효하지 않은 전화번호 형식입니다.");
         } else if (userRepository.findByEmail(registerForm.getEmail()).isPresent()) {
             throw new CustomExceptions.InvalidRegisterCredentialsException("이미 가입된 이메일입니다.");
         } else if (!registerForm.getPassword().equals(registerForm.getPasswordCheck())) {
@@ -51,6 +55,7 @@ public class UserService {
                 .email(registerForm.getEmail())
                 .password(Base64Encoder.encode(registerForm.getPassword()))
                 .username(registerForm.getUsername())
+                .phoneNumber(registerForm.getPhoneNumber())
                 .userRole(UserRole.USER)
                 .build();
 
