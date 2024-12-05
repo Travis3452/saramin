@@ -2,16 +2,18 @@ package com.example.saramin.service;
 
 import com.example.saramin.auth.JwtToken;
 import com.example.saramin.auth.JwtTokenProvider;
+import com.example.saramin.controllerAdvice.CustomExceptions;
 import com.example.saramin.entity.UserRole;
 import com.example.saramin.entity.dto.LoginForm;
-import com.example.saramin.entity.dto.UserDto;
-import com.example.saramin.entity.model.RefreshToken;
-import com.example.saramin.repository.RefreshTokenRepository;
-import com.example.saramin.util.Base64Encoder;
-import com.example.saramin.controllerAdvice.CustomExceptions;
 import com.example.saramin.entity.dto.RegisterForm;
+import com.example.saramin.entity.dto.UserDto;
+import com.example.saramin.entity.model.LoginHistory;
+import com.example.saramin.entity.model.RefreshToken;
 import com.example.saramin.entity.model.User;
+import com.example.saramin.repository.LoginHistoryRepository;
+import com.example.saramin.repository.RefreshTokenRepository;
 import com.example.saramin.repository.UserRepository;
+import com.example.saramin.util.Base64Encoder;
 import com.example.saramin.util.EmailValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -31,6 +34,7 @@ import java.util.Map;
 public class UserService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final LoginHistoryRepository loginHistoryRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
@@ -73,6 +77,13 @@ public class UserService {
                     .build();
 
             refreshTokenRepository.save(refreshToken);
+
+            LoginHistory loginHistory = LoginHistory.builder()
+                    .email(email)
+                    .loginDate(new Date(System.currentTimeMillis()))
+                    .build();
+
+            loginHistoryRepository.save(loginHistory);
 
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("status", "success");
