@@ -13,4 +13,8 @@ public class Base64Encoder {
         byte[] decodedBytes = Base64.getDecoder().decode(encodedPassword);
         return new String(decodedBytes, StandardCharsets.UTF_8);
     }
+
+    public static boolean matches(String rawPassword, String encodedPassword) {
+        return encodedPassword.equals(encode(rawPassword));
+    }
 }
