@@ -16,4 +16,8 @@ public class CustomExceptions {
     public static class InvalidLoginCredentialsException extends Exception {
         public InvalidLoginCredentialsException(String message) { super(message); }
     }
+
+    public static class InvalidProfileCredentialsException extends Exception {
+        public InvalidProfileCredentialsException(String message) { super(message); }
+    }
 }
