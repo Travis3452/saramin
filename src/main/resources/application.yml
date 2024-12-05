@@ -9,8 +9,12 @@ spring:
     password: root1234!!
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     show-sql: true
 jwt:
-  secret: secret
+  secret: EE31F6B4308522E4F01BF583E6DFDC1CA1A3DDF953837C913B15E1CE98A170F7
   token-validity-in-seconds: 86400
+
+logging:
+  level:
+    org.springframework.security: DEBUG
