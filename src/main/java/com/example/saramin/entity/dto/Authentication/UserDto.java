@@ -1,4 +1,4 @@
-package com.example.saramin.entity.dto;
+package com.example.saramin.entity.dto.Authentication;
 
 import com.example.saramin.entity.model.User;
 import lombok.AllArgsConstructor;

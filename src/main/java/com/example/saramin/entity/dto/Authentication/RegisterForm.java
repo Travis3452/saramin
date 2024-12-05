@@ -1,4 +1,4 @@
-package com.example.saramin.entity.dto;
+package com.example.saramin.entity.dto.Authentication;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
