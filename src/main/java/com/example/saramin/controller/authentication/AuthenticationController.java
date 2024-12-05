@@ -1,8 +1,10 @@
 package com.example.saramin.controller.authentication;
 
 import com.example.saramin.controllerAdvice.CustomExceptions;
-import com.example.saramin.entity.dto.LoginForm;
-import com.example.saramin.entity.dto.RegisterForm;
+import com.example.saramin.entity.dto.Authentication.LoginForm;
+import com.example.saramin.entity.dto.Authentication.RefreshForm;
+import com.example.saramin.entity.dto.Authentication.RegisterForm;
+import com.example.saramin.service.RefreshTokenService;
 import com.example.saramin.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthenticationController implements AuthenticationControllerDocs {
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterForm registerForm) {
@@ -40,11 +43,27 @@ public class AuthenticationController implements AuthenticationControllerDocs {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginForm loginForm) {
         Map<String, Object> response = new LinkedHashMap<>();
+
         try {
             response = userService.login(loginForm);
 
             return ResponseEntity.ok(response);
         } catch (CustomExceptions.InvalidLoginCredentialsException e) {
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<Map<String, Object>> refresh(@RequestBody RefreshForm refreshForm) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        try {
+            response = refreshTokenService.refresh(refreshForm);
+
+            return ResponseEntity.ok(response);
+        } catch (CustomExceptions.InvalidTokenException e) {
             response.put("status", "error");
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
