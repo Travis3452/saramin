@@ -21,4 +21,7 @@ public class RegisterForm {
 
     @Schema(description = "사용자 이름", example = "홍길동")
     private String username;
+
+    @Schema(description = "전화번호", example = "010-1234-5678")
+    private String phoneNumber;
 }
