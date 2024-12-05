@@ -15,12 +15,14 @@ public class UserDto {
 
     private String email;
     private String username;
+    private String phoneNumber;
 
     public static UserDto toDto(User user) {
         return UserDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .username(user.getUsername())
+                .phoneNumber(user.getPhoneNumber())
                 .build();
     }
 }
