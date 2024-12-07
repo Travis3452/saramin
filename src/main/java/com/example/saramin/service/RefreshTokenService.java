@@ -2,7 +2,7 @@ package com.example.saramin.service;
 
 import com.example.saramin.auth.JwtToken;
 import com.example.saramin.auth.JwtTokenProvider;
-import com.example.saramin.controllerAdvice.CustomExceptions;
+import com.example.saramin.customException.CustomExceptions;
 import com.example.saramin.entity.dto.Authentication.RefreshForm;
 import com.example.saramin.entity.model.RefreshToken;
 import com.example.saramin.repository.RefreshTokenRepository;
@@ -22,13 +22,13 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public Map<String, Object> refresh(RefreshForm refreshForm) throws CustomExceptions.InvalidTokenException {
+    public Map<String, Object> refresh(RefreshForm refreshForm) throws CustomExceptions.BadRequestException, CustomExceptions.UnauthorizedException {
         Map<String, Object> response = new LinkedHashMap<>();
 
         RefreshToken refreshToken = refreshTokenRepository.findAllByValue(refreshForm.getRefreshToken());
 
         if (refreshToken == null || !refreshForm.getEmail().equals(refreshToken.getEmail())) {
-            throw new CustomExceptions.InvalidTokenException("유효하지 않은 토큰입니다");
+            throw new CustomExceptions.BadRequestException("유효하지 않은 토큰입니다");
         }
 
         try {
@@ -44,7 +44,7 @@ public class RefreshTokenService {
 
             return response;
         } catch (RuntimeException e) {
-            throw new CustomExceptions.InvalidTokenException(e.getMessage());
+            throw new CustomExceptions.UnauthorizedException(e.getMessage());
         }
     }
 }
