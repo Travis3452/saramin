@@ -4,6 +4,7 @@ import com.example.saramin.entity.model.Company;
 import com.example.saramin.entity.model.JobPost;
 import com.example.saramin.repository.CompanyRepository;
 import com.example.saramin.repository.JobPostRepository;
+import com.example.saramin.util.CareerConverter;
 import com.example.saramin.util.CrawlerValidator;
 import com.example.saramin.util.DateParser;
 import jakarta.annotation.PostConstruct;
@@ -34,13 +35,13 @@ public class CrawlerService {
 
     @PostConstruct
     public void init() {
-        log.info("Start crawl");
+        log.info("크롤링 시작");
         try {
             crawlJobPosts();
         } catch (Exception e) {
-            log.error("Error during crawling job posts: {}", e.getMessage(), e);
+            log.error("크롤링 중 오류 발생: {}", e.getMessage(), e);
         }
-        log.info("End crawl");
+        log.info("크롤링 종료");
     }
 
     public void crawlJobPosts() {
@@ -48,7 +49,7 @@ public class CrawlerService {
 
         for (int key = 185; key <= 318; key++) {
             if (totalJobCount >= TOTAL_MAX_JOBS) break;
-            log.info("Processing category key: {}", key);
+            log.info("카테고리 키 처리 중: {}", key);
 
             String url = String.format(BASE_URL, key);
             addRandomDelay();
@@ -57,7 +58,7 @@ public class CrawlerService {
                 Document doc = Jsoup.connect(url).get();
 
                 String skillStack = doc.select(".wrap_title_recruit .value").text();
-                log.info("Skill Stack: {}", skillStack);
+                log.info("기술 스택: {}", skillStack);
 
                 Elements jobItems = doc.select(".list_recruiting .list_body .list_item");
                 int jobCountForKey = 0;
@@ -66,30 +67,29 @@ public class CrawlerService {
                     if (jobCountForKey >= MAX_JOBS_PER_KEY || totalJobCount >= TOTAL_MAX_JOBS) break;
 
                     String companyName = jobItem.select(".company_nm .str_tit").text();
-                    log.info("Company Name: {}", companyName);
+                    log.info("회사 이름: {}", companyName);
 
                     String title = jobItem.select(".notification_info .job_tit .str_tit").text();
-                    log.info("Title: {}", title);
+                    log.info("채용 공고 제목: {}", title);
 
                     String deadlineText = jobItem.select(".support_detail > .date").text();
                     Date deadlineDate = DateParser.parseDeadlineDate(deadlineText);
-                    log.info("Deadline Date: {}", deadlineDate);
+                    log.info("채용 공고 마감일: {}", deadlineDate);
 
                     String postDateText = jobItem.select(".support_detail > .deadlines").text();
                     Date postDate = DateParser.parsePostDate(postDateText);
-                    log.info("Post Date: {}", postDate);
+                    log.info("채용 공고 게시일: {}", postDate);
 
                     String workPlace = jobItem.select(".recruit_info > ul > li p.work_place").text();
                     String career = jobItem.select(".recruit_info > ul > li p.career").text();
                     String education = jobItem.select(".recruit_info > ul > li p.education").text();
 
-                    log.info("Work Place: {}", workPlace);
-                    log.info("Career: {}", career);
-                    log.info("Education: {}", education);
+                    log.info("근무 장소: {}", workPlace);
+                    log.info("경력: {}", career);
+                    log.info("학력: {}", education);
 
                     if (crawlerValidator.isAnyFieldNull(companyName, title, workPlace, career, education, deadlineDate, postDate)) {
-                        log.warn("Skipping job post due to null values: CompanyName={}, Title={}, DeadlineDate={}, PostDate={}, WorkPlace={}, Career={}, Education={}",
-                                companyName, title, deadlineDate, postDate, workPlace, career, education);
+                        log.warn("null 값이 있어 건너 뜀");
                         continue;
                     }
 
@@ -97,19 +97,22 @@ public class CrawlerService {
                     Company company;
                     if (existingCompany.isPresent()) {
                         company = existingCompany.get();
-                        log.info("Existing company found: {}", company.getCompanyName());
+                        log.info("중복 회사: {}", company.getCompanyName());
                     } else {
                         company = Company.builder()
                                 .companyName(companyName)
                                 .build();
                         companyRepository.save(company);
-                        log.info("Saved new company: {}", company.getCompanyName());
+                        log.info("회사 저장: {}", company.getCompanyName());
                     }
 
                     if (!crawlerValidator.isJobPostValid(title, company) || !crawlerValidator.isJobPostUnique(title, company)) {
-                        log.info("Job post already exists or is invalid: {}", title);
+                        log.info("채용 공고가 중복되거나 유효하지 않습니다");
                         continue;
                     }
+
+                    Integer careerMin = CareerConverter.extractMinCareer(career);
+                    Integer careerMax = CareerConverter.extractMaxCareer(career);
 
                     JobPost jobPost = JobPost.builder()
                             .title(title)
@@ -120,16 +123,18 @@ public class CrawlerService {
                             .education(education)
                             .postDate(postDate)
                             .deadline(deadlineDate)
+                            .careerMin(careerMin)
+                            .careerMax(careerMax)
                             .build();
 
                     jobPostRepository.save(jobPost);
-                    log.info("Saved job post: {}", jobPost.getTitle());
+                    log.info("채용 공고 저장 완료: {}", jobPost.getTitle());
 
                     jobCountForKey++;
                     totalJobCount++;
                 }
             } catch (IOException e) {
-                log.error("Error fetching the page for key {}: {}", key, e.getMessage());
+                log.error("키 {}에 대한 크롤링 중 오류 발생: {}", key, e.getMessage());
             }
         }
     }
@@ -138,10 +143,9 @@ public class CrawlerService {
         try {
             int delay = ThreadLocalRandom.current().nextInt(1000, 3001);
             Thread.sleep(delay);
-            log.info("Waiting for {} milliseconds", delay);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.error("Delay was interrupted", e);
+            log.error("지연 중 오류 발생", e);
         }
     }
 }
