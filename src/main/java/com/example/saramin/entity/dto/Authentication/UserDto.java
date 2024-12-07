@@ -21,8 +21,8 @@ public class UserDto {
         return UserDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
-                .username(user.getUsername())
-                .phoneNumber(user.getPhoneNumber())
+                .username(user.getProfile().getUsername())
+                .phoneNumber(user.getProfile().getPhoneNumber())
                 .build();
     }
 }
