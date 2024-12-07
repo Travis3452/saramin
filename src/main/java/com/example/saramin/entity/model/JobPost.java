@@ -1,10 +1,7 @@
 package com.example.saramin.entity.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,6 +9,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,11 +27,18 @@ public class JobPost {
 
     private String career;
 
+    private Integer careerMin;
+
+    private Integer careerMax;
+
     private String education;
 
     private Date postDate;
 
     private Date deadline;
+
+    @Builder.Default
+    private Integer viewCount = 0;
 
     @ManyToOne
     @JoinColumn(name = "company_id")
@@ -47,4 +52,5 @@ public class JobPost {
     )
     @Builder.Default
     private List<User> applicants = new ArrayList<>();
+
 }
