@@ -6,15 +6,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "application_list")
-public class ApplicationList {
+@Table(name = "application")
+public class Application {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,5 +27,6 @@ public class ApplicationList {
     @JoinColumn(name = "job_post_id", nullable = false)
     private JobPost jobPost;
 
-    private Date appliedAt;
+    private String resume;
+    private LocalDateTime appliedAt;
 }
