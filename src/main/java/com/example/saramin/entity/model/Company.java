@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -18,4 +21,9 @@ public class Company {
     private Long id;
 
     private String companyName;
+
+    @OneToMany(mappedBy = "company")
+    @Builder.Default
+    private List<JobPost> jobPosts = new ArrayList<>();
 }
+
