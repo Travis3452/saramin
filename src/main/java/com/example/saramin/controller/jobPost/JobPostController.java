@@ -14,19 +14,19 @@ import java.util.Map;
 @RestController
 @RequestMapping("/jobs")
 @RequiredArgsConstructor
-@Tag(name = "Jobs", description = "채용 공고 관련 관련 API")
-public class JobPostController {
+@Tag(name = "Jobs", description = "채용 공고 관련 API")
+public class JobPostController implements JobPostControllerDocs {
     private final JobPostService jobPostService;
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> getJobPosts(
-            @Parameter(description = "현재 페이지 번호", example = "1") @RequestParam(required = false) Integer currentPage,
-            @Parameter(description = "정렬 기준: newest(최신순) 혹은 alphabetical(가나다순)", example = "newest") @RequestParam(required = false) String sortBy,
-            @Parameter(description = "지역 필터(null일 경우 필터링하지 않음)", example = "서울전체") @RequestParam(required = false) String workplace,
-            @Parameter(description = "경력 필터(null일 경우 필터링하지 않음) 예시의 경우 경력 5년 이하를 의미", example = "5") @RequestParam(required = false) Integer career,
-            @Parameter(description = "기술 스택 필터(null일 경우 필터링하지 않음) 그누보드, 라즈베리파이 등", example = "라즈베리파이") @RequestParam(required = false) String skillStack,
-            @Parameter(description = "검색 방식(null일 경우 검색하지 않음) title(제목) 혹은 companyName(회사명)", example = "title") @RequestParam(required = false) String searchBy,
-            @Parameter(description = "검색에 사용할 키워드", example = "개발") @RequestParam(required = false) String keyword) {
+            Integer currentPage,
+            String sortBy,
+            String workplace,
+            Integer career,
+            String skillStack,
+            String searchBy,
+            String keyword) {
 
         JobsRequestForm requestForm = new JobsRequestForm(currentPage, sortBy, workplace, career, skillStack, searchBy, keyword);
 
