@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -27,5 +27,5 @@ public class Bookmark {
     @JoinColumn(name = "job_post_id", nullable = false)
     private JobPost jobPost;
 
-    private Date bookmarkedAt;
+    private LocalDateTime bookmarkedAt;
 }
