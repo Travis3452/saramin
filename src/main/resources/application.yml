@@ -17,4 +17,8 @@ jwt:
 
 logging:
   level:
+    root: INFO
+    com.example.saramin: INFO
     org.springframework.security: DEBUG
+    org.springframework: INFO
+    org.springframework.web: DEBUG
